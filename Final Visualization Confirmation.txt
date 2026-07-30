@@ -1,0 +1,30 @@
+Subject: Review and Confirmation Required – Dashboard Visuals for Final Design Sign-off
+
+Hi Team,
+
+Please find the attached spreadsheet containing the proposed visuals for the following dashboards:
+
+Retention Dashboard
+Member Behavioural Dashboard
+BD4 Dashboard
+Rollover Dashboard
+
+A separate worksheet has been created for each dashboard, listing all the proposed visuals/components included in the current mock-up.
+
+We request you to review each dashboard and indicate whether each visual is Required (Y) or Not Required (N) in the "Required (Y/N)" column. If you have any additional comments or suggested changes, please provide them in the Remarks column.
+
+Your confirmation will help us:
+
+Finalize the dashboard design and layout.
+Ensure that only the required visuals are included in the final solution.
+Obtain business sign-off before proceeding with the dashboard development.
+
+If there are any additional visuals or changes that you would like to include, please mention them in the Remarks column.
+
+Kindly review the attached spreadsheet and share your feedback at your earliest convenience.
+
+Thank you for your support.
+
+Regards,
+Power BI Team
+
