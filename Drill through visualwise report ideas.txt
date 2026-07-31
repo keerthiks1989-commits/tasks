@@ -1,0 +1,32 @@
+Member-related visuals
+
+Use one common drill-through.
+
+Retention Rate
+Retention Rate (FUM)
+Active Members
+Members at Risk
+Member Movements
+Churn Risk Distribution
+Top Drivers of Churn
+Inactivity Exit Rate
+
+All these can share the same page.
+
+Financial visuals
+
+Have another drill-through.
+
+Net Cashflow
+Inflow vs Outflow (FUM)
+Net Rollover Ratio
+
+These should show
+
+Transaction Date
+Contribution Amount
+Withdrawal Amount
+Rollover Amount
+Destination Fund
+Account Balance
+etc.
