@@ -1,0 +1,59 @@
+Collated Queries and Table List
+
+Database: USE SalesForce
+
+Queries
+
+1.  SELECT TOP 100 * FROM staging.[salesforce].contact WHERE id IN (
+    SELECT TOP 100 salesforcePersonId FROM
+    mercerdm.salesforce.transmemberaccount WHERE fundid = 5888 );
+
+2.  SELECT TOP 100 * FROM mercerdm.salesforce.transmemberaccount;
+
+3.  SELECT TOP 100 * FROM mercerdm.salesforce.transmemberaccount WHERE
+    fundid = 5888;
+
+4.  SELECT TOP 100 * FROM
+    staging.[salesforce].[practifi__Relationship__c] WHERE
+    [practifi__To_Contact__c] IN ( SELECT TOP 100 salesforcePersonId
+    FROM mercerdm.salesforce.transmemberaccount WHERE fundid = 5888 );
+
+5.  SELECT * FROM staging.[salesforce].contact WHERE id IN ( SELECT TOP
+    100 salesforcePersonId FROM mercerdm.salesforce.transmemberaccount
+    WHERE fundid = 5888 );
+
+6.  (Partial query shown in screenshot) SELECT * FROM
+    [salesforce].[practifi__Asset_Liability__c] WHERE …;
+
+7.  SELECT TOP 100 * FROM mercerdm.salesforce.transmemberaccount WHERE
+    fundid = 1803;
+
+Table List
+
+staging.salesforce.contact staging.salesforce.account
+staging.salesforce.practifi__Relationship__c
+staging.salesforce.Call_Wrap_Code__c
+salesforce.practifi__Asset_Liability__c
+
+Objects visible in Object Explorer
+
+salesforce.practifi__Asset_Liability__Role__c
+salesforce.practifi__Batch__c salesforce.practifi__Category__c
+salesforce.practifi__Deal__c salesforce.practifi__Division__c
+salesforce.practifi__Division_Member__c salesforce.practifi__Fee__c
+salesforce.practifi__Financial_Product__c
+salesforce.practifi__Installment__c salesforce.practifi__Installment__c
+salesforce.practifi__Policy__c salesforce.practifi__Policy_Coverage__c
+salesforce.practifi__Policy_Coverage_Role__c
+salesforce.practifi__Policy_Role__c salesforce.practifi__Process__c
+salesforce.practifi__Process_Stage__c
+salesforce.practifi__Process_Task__c
+salesforce.practifi__Process_Type__c
+salesforce.practifi__Reference_Document__c
+salesforce.practifi__Relationship__c
+salesforce.practifi__Relationship_Type__c
+salesforce.practifi__Service__c salesforce.practifi__Stage_History__c
+salesforce.practifi__Task_Outcome__c
+
+Note: - The last Asset_Liability query is incomplete in the screenshots,
+so only the visible portion is included.
