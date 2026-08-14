@@ -1,0 +1,10 @@
+Analyze available source tables and columns relevant to the Retention Analytics Dashboard.
+Identify the required data elements for each retention KPI and dashboard metric.
+Review existing Tableau retention dashboards and understand the current KPI definitions and business logic.
+Identify Tableau KPIs and visuals that can be mirrored in the Power BI dashboard.
+Analyze existing calculations, filters, trends, and business rules used in the Tableau dashboards.
+Map the identified source data elements to the corresponding Power BI dashboard requirements.
+Validate data availability and identify any gaps or missing data required for the dashboard.
+Assess relationships between relevant tables to support accurate KPI calculations.
+Document the findings, data mappings, KPI logic, and key dependencies for Power BI development.
+Ensure the proposed Power BI dashboard aligns with the existing Tableau outputs for consistency and continuity.
