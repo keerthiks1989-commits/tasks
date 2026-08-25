@@ -1,0 +1,50 @@
+SELECT TOP 100
+    S.fundID,
+    S.memberNumber,
+    S.accountID,
+    S.customerID,
+    S.accountBalanceAtExit,
+    S.accountBalanceAtLastReview,
+    S.accountBalanceEndOfMonth,
+    S.accountRef,
+
+    CD.<required_column>,
+    AI.<required_column>,
+    INV.<required_column>,
+    MI.<required_column>,
+    NMF.<required_column>,
+    RP.<required_column>
+
+FROM [edgeSource].[AccountSummary] S WITH (NOLOCK)
+
+LEFT JOIN [edgeSource].[accountContactDetails] CD WITH (NOLOCK)
+    ON S.fundID = CD.fundID
+    AND S.accountID = CD.accountID
+
+LEFT JOIN [edgeSource].[AccountInteractions] AI WITH (NOLOCK)
+    ON S.fundID = AI.fundID
+    AND S.accountID = AI.accountID
+
+LEFT JOIN [edgeSource].[AccountInvestments] INV WITH (NOLOCK)
+    ON S.fundID = INV.fundID
+    AND S.accountID = INV.accountID
+
+LEFT JOIN [edgeSource].[accountMoneyInflow] MI WITH (NOLOCK)
+    ON S.fundID = MI.fundID
+    AND S.accountID = MI.accountID
+
+LEFT JOIN [edgeSource].[AccountNetMoneyFlow] NMF WITH (NOLOCK)
+    ON S.fundID = NMF.fundID
+    AND S.accountID = NMF.accountID;
+
+
+--------------------------------------------------------------------------------------------------------
+SELECT 
+    fundID,
+    accountID,
+    COUNT(*) AS RowCount
+FROM [edgeSource].[AccountInteractions] WITH (NOLOCK)
+GROUP BY 
+    fundID,
+    accountID
+HAVING COUNT(*) > 1;
