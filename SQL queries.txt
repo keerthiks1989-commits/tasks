@@ -1,0 +1,125 @@
+SELECT
+    S.*,
+    CD.*,
+    AI.*,
+    INV.*,
+    MI.*,
+    NMF.*,
+    RP.*,
+    MB.*,
+    C.*
+FROM [edgeSource].[AccountSummary] S
+
+LEFT JOIN [edgeSource].[accountContactDetails] CD
+    ON S.fundID = CD.fundID
+    AND S.accountID = CD.accountID
+
+LEFT JOIN [edgeSource].[AccountInteractions] AI
+    ON S.fundID = AI.fundID
+    AND S.accountID = AI.accountID
+
+LEFT JOIN [edgeSource].[AccountInvestments] INV
+    ON S.fundID = INV.fundID
+    AND S.accountID = INV.accountID
+
+LEFT JOIN [edgeSource].[accountMoneyInflow] MI
+    ON S.fundID = MI.fundID
+    AND S.accountID = MI.accountID
+
+LEFT JOIN [edgeSource].[accountNetMoneyFlow] NMF
+    ON S.fundID = NMF.fundID
+    AND S.accountID = NMF.accountID
+
+LEFT JOIN [edgeSource].[accountRolloverPayment] RP
+    ON S.fundID = RP.fundID
+    AND S.accountID = RP.accountID
+
+LEFT JOIN [edgeSource].[AccountMemberBreakdown] MB
+    ON S.fundID = MB.fundID
+    AND S.accountID = MB.accountID
+
+LEFT JOIN [edgeSource].[AccountContribution] C
+    ON S.fundID = C.fundID
+    AND S.accountID = C.accountID;
+
+-----------------------------------------------------------------------
+
+SELECT
+    S.*,
+    CD.*,
+    AI.*,
+    INV.*,
+    MI.*,
+    NMF.*,
+    RP.*,
+    MB.*,
+    C.*
+FROM
+(
+    SELECT TOP 10 *
+    FROM [edgeSource].[AccountSummary]
+) S
+
+LEFT JOIN [edgeSource].[accountContactDetails] CD
+    ON S.fundID = CD.fundID
+    AND S.accountID = CD.accountID
+
+LEFT JOIN [edgeSource].[AccountInteractions] AI
+    ON S.fundID = AI.fundID
+    AND S.accountID = AI.accountID
+
+LEFT JOIN [edgeSource].[AccountInvestments] INV
+    ON S.fundID = INV.fundID
+    AND S.accountID = INV.accountID
+
+LEFT JOIN [edgeSource].[accountMoneyInflow] MI
+    ON S.fundID = MI.fundID
+    AND S.accountID = MI.accountID
+
+LEFT JOIN [edgeSource].[accountNetMoneyFlow] NMF
+    ON S.fundID = NMF.fundID
+    AND S.accountID = NMF.accountID
+
+LEFT JOIN [edgeSource].[accountRolloverPayment] RP
+    ON S.fundID = RP.fundID
+    AND S.accountID = RP.accountID
+
+LEFT JOIN [edgeSource].[AccountMemberBreakdown] MB
+    ON S.fundID = MB.fundID
+    AND S.accountID = MB.accountID
+
+LEFT JOIN [edgeSource].[AccountContribution] C
+    ON S.fundID = C.fundID
+    AND S.accountID = C.accountID;
+
+---------------------------------------------------------------
+
+SELECT
+    S.fundID,
+    S.accountID,
+    INV.accountID AS InvestmentAccountID,
+    INV.investmentCode,
+    INV.investmentDate,
+    INV.units,
+    INV.value
+FROM [edgeSource].[AccountSummary] S
+
+LEFT JOIN [edgeSource].[AccountInvestments] INV
+    ON S.fundID = INV.fundID
+    AND S.accountID = INV.accountID
+
+WHERE S.fundID = 70
+  AND S.accountID = 8522452;
+
+--------------------------------------------------------------
+
+SELECT
+    fundID,
+    accountID,
+    SUM(inflowAmount) AS TotalMoneyInflow
+FROM [edgeSource].[accountMoneyInflow]
+GROUP BY
+    fundID,
+    accountID;
+
+--------------------------------------
