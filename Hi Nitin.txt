@@ -1,0 +1,9 @@
+Hi Nitin,
+
+Thank you for providing the list of attributes for the sample reports.
+
+We have reviewed the list against the dashboard requirements and identified some additional fields required for building the sample dashboards. These have been marked as “N” in the spreadsheet for further validation and discussion.
+
+Apart from the additional attributes, building the sample dashboards will also require SQL queries to retrieve/derive the required data and DAX measures to calculate the required KPIs and dashboard metrics.
+
+We will continue to validate the data availability, query logic, and calculation requirements as part of the sample dashboard development and identify any further gaps, if applicable.
