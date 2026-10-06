@@ -1,0 +1,6 @@
+Hi Team,
+Based on Nathan’s query, we have reviewed the available data and identified the fields required to build the Retention Analytics Dashboard.
+During our review, we found that some of the required columns/data points are currently missing from the query output. We have documented these requirements in the attached spreadsheet under the “Missing Data” section.
+Additionally, we understand that the CSAT and NPS data is sourced from Qualtrics. Could you please provide some sample data for CSAT and NPS as well, so that we can understand the available fields and incorporate them appropriately into the dashboard?
+Could you please help us with sample data for the missing fields mentioned in the attached spreadsheet? This will help us validate the data structure, finalize the data model, and proceed with the dashboard development.
+Please let us know if you need any further clarification from our side.
