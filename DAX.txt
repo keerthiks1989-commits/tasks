@@ -1,0 +1,68 @@
+Members at End Period =
+CALCULATE(
+    DISTINCTCOUNT(Query1[memberNumber]),
+    Query1[AccountStatus] = "Active",
+    Query1[CountAsAccount] = 1
+)
+
+-------------------------------------------------------------
+
+Members at Start Period =
+VAR CurrentMonth =
+    MAX(Query1[month_start])
+
+VAR PreviousMonth =
+    EDATE(CurrentMonth, -1)
+
+RETURN
+CALCULATE(
+    DISTINCTCOUNT(Query1[memberNumber]),
+    REMOVEFILTERS(Calendar),
+    Query1[month_start] = PreviousMonth,
+    Query1[AccountStatus] = "Active",
+    Query1[CountAsAccount] = 1
+)
+
+--------------------------------------------------------------------------
+
+Retained Members =
+VAR CurrentMonth =
+    MAX(Query1[month_start])
+
+VAR PreviousMonth =
+    EDATE(CurrentMonth, -1)
+
+VAR StartMembers =
+    CALCULATETABLE(
+        VALUES(Query1[memberNumber]),
+        REMOVEFILTERS(Calendar),
+        Query1[month_start] = PreviousMonth,
+        Query1[AccountStatus] = "Active",
+        Query1[CountAsAccount] = 1
+    )
+
+VAR EndMembers =
+    CALCULATETABLE(
+        VALUES(Query1[memberNumber]),
+        REMOVEFILTERS(Calendar),
+        Query1[month_start] = CurrentMonth,
+        Query1[AccountStatus] = "Active",
+        Query1[CountAsAccount] = 1
+    )
+
+RETURN
+    COUNTROWS(
+        INTERSECT(
+            StartMembers,
+            EndMembers
+        )
+    )
+
+--------------------------------------------------------------------------------
+
+Retention Rate Member =
+DIVIDE(
+    [Retained Members],
+    [Members at Start Period],
+    0
+)
