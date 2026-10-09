@@ -1,0 +1,50 @@
+Start Month =
+DISTINCT(
+    SELECTCOLUMNS(
+        'Calendar',
+        "MonthStart",
+        DATE(
+            YEAR('Calendar'[Date]),
+            MONTH('Calendar'[Date]),
+            1
+        ),
+        "MonthYear",
+        FORMAT('Calendar'[Date], "MMM-yy"),
+        "SortOrder",
+        YEAR('Calendar'[Date]) * 100
+            + MONTH('Calendar'[Date])
+    )
+)
+
+------------------------------------------------
+
+
+End Month =
+DISTINCT(
+    SELECTCOLUMNS(
+        'Calendar',
+        "MonthStart",
+        DATE(
+            YEAR('Calendar'[Date]),
+            MONTH('Calendar'[Date]),
+            1
+        ),
+        "MonthYear",
+        FORMAT('Calendar'[Date], "MMM-yy"),
+        "SortOrder",
+        YEAR('Calendar'[Date]) * 100
+            + MONTH('Calendar'[Date])
+    )
+)
+
+----------------------------------------------------------
+
+Selected Start Month =
+SELECTEDVALUE('Start Month'[MonthStart])
+
+-----------------------------------------------------------
+Selected End Month =
+SELECTEDVALUE('End Month'[MonthStart])
+
+-------------------------------------------------------
+
