@@ -1,0 +1,54 @@
+Retention_Rate_FUM % =
+VAR StartMonth =
+    SELECTEDVALUE(Start_Month[MonthStart])
+
+VAR EndMonth =
+    SELECTEDVALUE(End_Month[MonthStart])
+
+VAR StartMembers =
+    CALCULATETABLE(
+        VALUES(Query1[memberNumber]),
+        REMOVEFILTERS(Query1[month_startdate]),
+        Query1[month_startdate] = StartMonth,
+        Query1[AccountStatus] = "Active"
+    )
+
+VAR EndMembers =
+    CALCULATETABLE(
+        VALUES(Query1[memberNumber]),
+        REMOVEFILTERS(Query1[month_startdate]),
+        Query1[month_startdate] = EndMonth,
+        Query1[AccountStatus] = "Active"
+    )
+
+VAR RetainedMembers =
+    INTERSECT(StartMembers, EndMembers)
+
+VAR OpeningFUM =
+    CALCULATE(
+        SUM(Query1[FUM_Event]),
+        REMOVEFILTERS(Query1[month_startdate]),
+        Query1[month_startdate] = StartMonth,
+        Query1[AccountStatus] = "Active"
+    )
+
+VAR RetainedOpeningFUM =
+    CALCULATE(
+        SUM(Query1[FUM_Event]),
+        REMOVEFILTERS(Query1[month_startdate]),
+        Query1[month_startdate] = StartMonth,
+        Query1[AccountStatus] = "Active",
+        TREATAS(
+            RetainedMembers,
+            Query1[memberNumber]
+        )
+    )
+
+RETURN
+    IF(
+        ISBLANK(StartMonth)
+            || ISBLANK(EndMonth)
+            || StartMonth >= EndMonth,
+        BLANK(),
+        DIVIDE(RetainedOpeningFUM, OpeningFUM)
+    )
