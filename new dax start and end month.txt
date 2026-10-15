@@ -1,0 +1,53 @@
+Selected_Period_Valid =
+VAR StartMonth =
+    SELECTEDVALUE(Start_Month[MonthStart])
+VAR EndMonth =
+    SELECTEDVALUE(End_Month[MonthStart])
+RETURN
+    IF(
+        NOT ISBLANK(StartMonth)
+            && NOT ISBLANK(EndMonth)
+            && StartMonth <= EndMonth
+            && EndMonth <= EOMONTH(StartMonth, 11),
+        1,
+        0
+    )
+
+-------------------------------------------------------------------
+Active_Members_Selected_Period =
+VAR StartMonth =
+    SELECTEDVALUE(Start_Month[MonthStart])
+VAR EndMonth =
+    SELECTEDVALUE(End_Month[MonthStart])
+RETURN
+    IF(
+        [Selected_Period_Valid] <> 1,
+        BLANK(),
+        CALCULATE(
+            [Active_Members],
+            REMOVEFILTERS(Calendar),
+            DATESBETWEEN(
+                Calendar[Date],
+                StartMonth,
+                EOMONTH(EndMonth, 0)
+            )
+        )
+    )
+
+---------------------------------------------------------------
+Period_Selection_Message =
+VAR StartMonth =
+    SELECTEDVALUE(Start_Month[MonthStart])
+VAR EndMonth =
+    SELECTEDVALUE(End_Month[MonthStart])
+RETURN
+    SWITCH(
+        TRUE(),
+        ISBLANK(StartMonth) || ISBLANK(EndMonth),
+            "Select Start Month and End Month",
+        EndMonth < StartMonth,
+            "End Month cannot be before Start Month",
+        EndMonth > EOMONTH(StartMonth, 11),
+            "Please select a maximum 12-month period",
+        BLANK()
+    )
