@@ -1,0 +1,102 @@
+Active_Members =
+VAR EndMonth =
+    SELECTEDVALUE(End_Month[MonthStart])
+RETURN
+    IF(
+        ISBLANK(EndMonth),
+        BLANK(),
+        CALCULATE(
+            DISTINCTCOUNT(Query1[memberNumber]),
+            REMOVEFILTERS(Query1[month_startdate]),
+            Query1[month_startdate] = EndMonth,
+            Query1[AccountStatus] = "Active"
+        )
+    )
+
+--------------------------------------------------
+Retention_Rate_Member % =
+VAR StartMonth =
+    SELECTEDVALUE(Start_Month[MonthStart])
+VAR EndMonth =
+    SELECTEDVALUE(End_Month[MonthStart])
+
+VAR StartMembers =
+    CALCULATETABLE(
+        VALUES(Query1[memberNumber]),
+        REMOVEFILTERS(Query1[month_startdate]),
+        Query1[month_startdate] = StartMonth,
+        Query1[AccountStatus] = "Active"
+    )
+
+VAR EndMembers =
+    CALCULATETABLE(
+        VALUES(Query1[memberNumber]),
+        REMOVEFILTERS(Query1[month_startdate]),
+        Query1[month_startdate] = EndMonth,
+        Query1[AccountStatus] = "Active"
+    )
+
+VAR RetainedMembers =
+    COUNTROWS(
+        INTERSECT(StartMembers, EndMembers)
+    )
+
+RETURN
+    IF(
+        ISBLANK(StartMonth)
+            || ISBLANK(EndMonth)
+            || StartMonth >= EndMonth,
+        BLANK(),
+        DIVIDE(
+            RetainedMembers,
+            COUNTROWS(StartMembers)
+        )
+    )
+
+--------------------------------------------------------
+Members_At_Risk_Selected =
+VAR EndMonth =
+    SELECTEDVALUE(End_Month[MonthStart])
+RETURN
+    IF(
+        ISBLANK(EndMonth),
+        BLANK(),
+        CALCULATE(
+            [Members_At_Risk],
+            REMOVEFILTERS(Query1[month_startdate]),
+            Query1[month_startdate] = EndMonth
+        )
+    )
+
+---------------------------------------------------------------
+Net_Movement_Selected =
+VAR EndMonth =
+    SELECTEDVALUE(End_Month[MonthStart])
+RETURN
+    IF(
+        ISBLANK(EndMonth),
+        BLANK(),
+        CALCULATE(
+            [Net_Movement],
+            REMOVEFILTERS(Query1[month_startdate]),
+            Query1[month_startdate] = EndMonth
+        )
+    )
+
+------------------------------------------------------------------
+
+Risk_Members_Selected =
+VAR EndMonth =
+    SELECTEDVALUE(End_Month[MonthStart])
+RETURN
+    IF(
+        ISBLANK(EndMonth),
+        BLANK(),
+        CALCULATE(
+            [Risk_Members],
+            REMOVEFILTERS(Query1[month_startdate]),
+            Query1[month_startdate] = EndMonth
+        )
+    )
+
+------------------------------------------
