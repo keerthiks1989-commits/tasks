@@ -1,0 +1,285 @@
+DimMonth =
+DISTINCT (
+    SELECTCOLUMNS (
+        Query1,
+        "MonthStart", Query1[month_start],
+        "MonthEnd", Query1[month_end],
+        "CalendarYear", Query1[calendar_year],
+        "CalendarMonth", Query1[calendar_month],
+        "FinancialYear", Query1[financial_year]
+    )
+)
+
+-------------------------------------------------------------
+Active Members =
+CALCULATE (
+    DISTINCTCOUNT ( Query1[memberNumber] ),
+    Query1[AccountStatus] = "Active",
+    Query1[CountAsAccount] = 1
+)
+
+-------------------------------------------------------------
+Active Accounts =
+CALCULATE (
+    DISTINCTCOUNT ( Query1[accountID] ),
+    Query1[AccountStatus] = "Active",
+    Query1[CountAsAccount] = 1
+)
+
+----------------------------------------------------------
+New Accounts =
+CALCULATE (
+    DISTINCTCOUNT ( Query1[accountID] ),
+    Query1[NewAccountInMonthFlag] = 1,
+    Query1[CountAsAccount] = 1
+)
+
+----------------------------------------------------------
+Exited Accounts =
+CALCULATE (
+    DISTINCTCOUNT ( Query1[accountID] ),
+    Query1[ExitedInMonthFlag] = 1,
+    Query1[CountAsAccount] = 1
+)
+
+-----------------------------------------------------------
+
+Net Movement =
+[New Accounts] - [Exited Accounts]
+
+-----------------------------------------------------------
+
+member Risk Members =
+CALCULATE (
+    DISTINCTCOUNT ( Query1[memberNumber] ),
+    Query1[AccountStatus] = "Active",
+    Query1[CountAsAccount] = 1,
+    Query1[low_balance_flag] = 1,
+    Query1[disengagement_flag] = 1
+)
+
+---------------------------------------------
+
+Member Retention Rate =
+VAR CurrentMonth =
+    MAX ( DimMonth[MonthStart] )
+VAR PreviousMonth =
+    EDATE ( CurrentMonth, -1 )
+
+VAR PreviousMembers =
+    CALCULATETABLE (
+        VALUES ( Query1[memberNumber] ),
+        REMOVEFILTERS ( DimMonth ),
+        DimMonth[MonthStart] = PreviousMonth,
+        Query1[AccountStatus] = "Active",
+        Query1[CountAsAccount] = 1
+    )
+
+VAR CurrentMembers =
+    CALCULATETABLE (
+        VALUES ( Query1[memberNumber] ),
+        REMOVEFILTERS ( DimMonth ),
+        DimMonth[MonthStart] = CurrentMonth,
+        Query1[AccountStatus] = "Active",
+        Query1[CountAsAccount] = 1
+    )
+
+VAR RetainedMembers =
+    COUNTROWS (
+        INTERSECT ( PreviousMembers, CurrentMembers )
+    )
+
+RETURN
+    DIVIDE ( RetainedMembers, COUNTROWS ( PreviousMembers ) )
+
+----------------------------------------------------------------------------------
+Monthly Exit Rate =
+VAR CurrentMonth =
+    MAX ( DimMonth[MonthStart] )
+VAR PreviousMonth =
+    EDATE ( CurrentMonth, -1 )
+VAR StartingAccounts =
+    CALCULATE (
+        [Active Accounts],
+        REMOVEFILTERS ( DimMonth ),
+        DimMonth[MonthStart] = PreviousMonth
+    )
+RETURN
+    DIVIDE (
+        [Exited Accounts],
+        StartingAccounts
+    )
+
+---------------------------------------------------------------------------------------
+New Accounts Previous Month =
+VAR CurrentMonth =
+    MAX ( DimMonth[MonthStart] )
+VAR PreviousMonth =
+    EDATE ( CurrentMonth, -1 )
+RETURN
+    CALCULATE (
+        [New Accounts],
+        REMOVEFILTERS ( DimMonth ),
+        DimMonth[MonthStart] = PreviousMonth
+    )
+
+------------------------------------------------
+New Accounts Change % =
+DIVIDE (
+    [New Accounts] - [New Accounts Previous Month],
+    [New Accounts Previous Month]
+)
+
+-----------------------------------------------
+
+ChurnDrivers =
+DATATABLE (
+    "Driver", STRING,
+    {
+        { "Low Balance" },
+        { "Disengagement" },
+        { "Financial Inactivity" },
+        { "Investment Switching" },
+        { "No Helpline Engagement" }
+    }
+)
+
+------------------------------------------------------------
+Members by Driver =
+VAR SelectedDriver =
+    SELECTEDVALUE ( ChurnDrivers[Driver] )
+RETURN
+    SWITCH (
+        SelectedDriver,
+
+        "Low Balance",
+            CALCULATE (
+                DISTINCTCOUNT ( Query1[memberNumber] ),
+                Query1[AccountStatus] = "Active",
+                Query1[CountAsAccount] = 1,
+                Query1[low_balance_flag] = 1
+            ),
+
+        "Disengagement",
+            CALCULATE (
+                DISTINCTCOUNT ( Query1[memberNumber] ),
+                Query1[AccountStatus] = "Active",
+                Query1[CountAsAccount] = 1,
+                Query1[disengagement_flag] = 1
+            ),
+
+        "Financial Inactivity",
+            CALCULATE (
+                DISTINCTCOUNT ( Query1[memberNumber] ),
+                Query1[AccountStatus] = "Active",
+                Query1[CountAsAccount] = 1,
+                Query1[financially_inactive_12m_flag] = 1
+            ),
+
+        "Investment Switching",
+            CALCULATE (
+                DISTINCTCOUNT ( Query1[memberNumber] ),
+                Query1[AccountStatus] = "Active",
+                Query1[CountAsAccount] = 1,
+                Query1[investment_switch_flag] = 1
+            ),
+
+        "No Helpline Engagement",
+            CALCULATE (
+                DISTINCTCOUNT ( Query1[memberNumber] ),
+                Query1[AccountStatus] = "Active",
+                Query1[CountAsAccount] = 1,
+                Query1[advice_helpline_engagement_12m_flag] = 0
+            )
+    )
+
+-------------------------------------------------------------
+Retention Rate (Member) =
+VAR CurrentMonth =
+    MAX ( DimMonth[MonthStart] )
+VAR PreviousMonth =
+    EDATE ( CurrentMonth, -1 )
+
+VAR PreviousMembers =
+    CALCULATETABLE (
+        VALUES ( Query1[memberNumber] ),
+        REMOVEFILTERS ( DimMonth ),
+        DimMonth[MonthStart] = PreviousMonth,
+        Query1[AccountStatus] = "Active",
+        Query1[CountAsAccount] = 1
+    )
+
+VAR CurrentMembers =
+    CALCULATETABLE (
+        VALUES ( Query1[memberNumber] ),
+        REMOVEFILTERS ( DimMonth ),
+        DimMonth[MonthStart] = CurrentMonth,
+        Query1[AccountStatus] = "Active",
+        Query1[CountAsAccount] = 1
+    )
+
+VAR RetainedMembers =
+    COUNTROWS (
+        INTERSECT ( PreviousMembers, CurrentMembers )
+    )
+
+RETURN
+    IF (
+        ISBLANK ( CurrentMonth ),
+        BLANK (),
+        DIVIDE (
+            RetainedMembers,
+            COUNTROWS ( PreviousMembers )
+        )
+    )
+
+-----------------------------------------------------------------
+Members at Risk =
+CALCULATE (
+    DISTINCTCOUNT ( Query1[memberNumber] ),
+    Query1[AccountStatus] = "Active",
+    Query1[CountAsAccount] = 1,
+    Query1[low_balance_flag] = 1,
+    Query1[disengagement_flag] = 1
+)
+
+-----------------------------------------------------------------------
+Members at Risk % =
+DIVIDE (
+    [Members at Risk],
+    [Active Members]
+)
+
+------------------------------------------
+Exit Rate (12M) - All Exits =
+VAR CurrentMonth =
+    MAX ( DimMonth[MonthStart] )
+VAR StartMonth =
+    EDATE ( CurrentMonth, -12 )
+
+VAR OpeningActiveAccounts =
+    CALCULATE (
+        [Active Accounts],
+        REMOVEFILTERS ( DimMonth ),
+        DimMonth[MonthStart] = StartMonth
+    )
+
+VAR ExitsLast12Months =
+    CALCULATE (
+        [Exited Accounts],
+        REMOVEFILTERS ( DimMonth ),
+        FILTER (
+            ALL ( DimMonth[MonthStart] ),
+            DimMonth[MonthStart] > StartMonth
+                && DimMonth[MonthStart] <= CurrentMonth
+        )
+    )
+
+RETURN
+    DIVIDE (
+        ExitsLast12Months,
+        OpeningActiveAccounts
+    )
+
+--------------------------------------------------------------------------------
+
