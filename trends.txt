@@ -1,0 +1,102 @@
+Retention Rate Member Trend % =
+VAR StartMonth =
+    SELECTEDVALUE ( Start_Month[MonthStart] )
+
+VAR TrendEndMonth =
+    SELECTEDVALUE ( Trend_Month[MonthStart] )
+
+VAR StartMembers =
+    CALCULATETABLE (
+        VALUES ( Query1[memberNumber] ),
+        REMOVEFILTERS ( 'calendar' ),
+        REMOVEFILTERS ( Query1[month_start] ),
+        Query1[month_start] = StartMonth,
+        Query1[AccountStatus] = "Active"
+    )
+
+VAR EndMembers =
+    CALCULATETABLE (
+        VALUES ( Query1[memberNumber] ),
+        REMOVEFILTERS ( 'calendar' ),
+        REMOVEFILTERS ( Query1[month_start] ),
+        Query1[month_start] = TrendEndMonth,
+        Query1[AccountStatus] = "Active"
+    )
+
+VAR RetainedMembers =
+    INTERSECT ( StartMembers, EndMembers )
+
+RETURN
+    IF (
+        ISBLANK ( StartMonth )
+            || ISBLANK ( TrendEndMonth )
+            || TrendEndMonth <= StartMonth,
+        BLANK (),
+        DIVIDE (
+            COUNTROWS ( RetainedMembers ),
+            COUNTROWS ( StartMembers )
+        )
+    )
+
+---------------------------------------------------------------
+
+Retention Rate FUM Trend % =
+VAR StartMonth =
+    SELECTEDVALUE ( Start_Month[MonthStart] )
+
+VAR TrendEndMonth =
+    SELECTEDVALUE ( Trend_Month[MonthStart] )
+
+VAR StartMembers =
+    CALCULATETABLE (
+        VALUES ( Query1[memberNumber] ),
+        REMOVEFILTERS ( 'calendar' ),
+        REMOVEFILTERS ( Query1[month_start] ),
+        Query1[month_start] = StartMonth,
+        Query1[AccountStatus] = "Active"
+    )
+
+VAR EndMembers =
+    CALCULATETABLE (
+        VALUES ( Query1[memberNumber] ),
+        REMOVEFILTERS ( 'calendar' ),
+        REMOVEFILTERS ( Query1[month_start] ),
+        Query1[month_start] = TrendEndMonth,
+        Query1[AccountStatus] = "Active"
+    )
+
+VAR RetainedMembers =
+    INTERSECT ( StartMembers, EndMembers )
+
+VAR OpeningFUM =
+    CALCULATE (
+        SUM ( Query1[FUM_Event] ),
+        REMOVEFILTERS ( 'calendar' ),
+        REMOVEFILTERS ( Query1[month_start] ),
+        Query1[month_start] = StartMonth,
+        Query1[AccountStatus] = "Active"
+    )
+
+VAR RetainedOpeningFUM =
+    CALCULATE (
+        SUM ( Query1[FUM_Event] ),
+        REMOVEFILTERS ( 'calendar' ),
+        REMOVEFILTERS ( Query1[month_start] ),
+        Query1[month_start] = StartMonth,
+        Query1[AccountStatus] = "Active",
+        TREATAS (
+            RetainedMembers,
+            Query1[memberNumber]
+        )
+    )
+
+RETURN
+    IF (
+        ISBLANK ( StartMonth )
+            || ISBLANK ( TrendEndMonth )
+            || TrendEndMonth <= StartMonth,
+        BLANK (),
+        DIVIDE ( RetainedOpeningFUM, OpeningFUM )
+    )
+
+------------------------------------------------------------------------------------------
