@@ -1,0 +1,50 @@
+DimMonth =
+VAR FirstMonth = DATE ( 2023, 4, 1 )
+VAR LastMonth =
+    MAXX (
+        Query1,
+        Query1[month_start]
+    )
+RETURN
+    ADDCOLUMNS (
+        FILTER (
+            CALENDAR ( FirstMonth, EOMONTH ( LastMonth, 0 ) ),
+            DAY ( [Date] ) = 1
+        ),
+        "MonthStart", [Date],
+        "MonthEnd", EOMONTH ( [Date], 0 ),
+        "MonthLabel", FORMAT ( [Date], "MMM-yy" ),
+        "MonthSort", YEAR ( [Date] ) * 100 + MONTH ( [Date] )
+    )
+
+
+-----------------------------------------------------------------------------------------
+Start_Month = DimMonth
+
+--------------------------------------
+End_Month = DimMonth
+
+----------------------------------------
+
+Selected Start Month =
+SELECTEDVALUE ( Start_Month[MonthStart] )
+
+-------------------------------------
+Selected End Month =
+SELECTEDVALUE ( End_Month[MonthStart] )
+
+-----------------------------------------------------------------
+Reporting Period Valid =
+VAR StartMonth = [Selected Start Month]
+VAR EndMonth = [Selected End Month]
+RETURN
+    IF (
+        NOT ISBLANK ( StartMonth )
+            && NOT ISBLANK ( EndMonth )
+            && StartMonth <= EndMonth,
+        1,
+        0
+    )
+
+-------------------------------------------------------------------
+
