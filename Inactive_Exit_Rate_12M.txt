@@ -1,0 +1,40 @@
+Inactive_Exit_Rate_12M =
+VAR StartMonth =
+    SELECTEDVALUE(Start_Month[MonthStart])
+VAR EndMonth =
+    SELECTEDVALUE(End_Month[MonthStart])
+
+VAR PeriodStart =
+    StartMonth
+VAR PeriodEnd =
+    EOMONTH(EndMonth, 0)
+
+VAR ExitedInactive =
+    CALCULATE(
+        DISTINCTCOUNT(Query1[memberNumber]),
+        REMOVEFILTERS(Query1[exitDate]),
+        NOT ISBLANK(Query1[exitDateRecorded]),
+        NOT ISBLANK(Query1[exitDate]),
+        Query1[exitDate] >= PeriodStart,
+        Query1[exitDate] < PeriodEnd + 1,
+        Query1[financially_inactive_12m_flag] = 1
+    )
+
+VAR TotalExited =
+    CALCULATE(
+        DISTINCTCOUNT(Query1[memberNumber]),
+        REMOVEFILTERS(Query1[exitDate]),
+        NOT ISBLANK(Query1[exitDateRecorded]),
+        NOT ISBLANK(Query1[exitDate]),
+        Query1[exitDate] >= PeriodStart,
+        Query1[exitDate] < PeriodEnd + 1
+    )
+
+RETURN
+    IF(
+        ISBLANK(StartMonth)
+            || ISBLANK(EndMonth)
+            || StartMonth > EndMonth,
+        BLANK(),
+        DIVIDE(ExitedInactive, TotalExited, 0)
+    )
