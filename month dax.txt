@@ -1,0 +1,40 @@
+
+DimMonth =
+ADDCOLUMNS(
+    DISTINCT(
+        SELECTCOLUMNS(
+            Sheet_1,
+            "MonthStart", Sheet_1[month_start]
+        )
+    ),
+    "MonthYear",
+        FORMAT([MonthStart], "MMM yy"),
+    "MonthSort",
+        YEAR([MonthStart]) * 100
+            + MONTH([MonthStart]),
+    "MonthEnd",
+        EOMONTH([MonthStart], 0)
+)
+
+
+--------------------------------------------------------------
+
+Start_Month =
+SELECTCOLUMNS(
+    DimMonth,
+    "MonthStart", DimMonth[MonthStart],
+    "MonthYear", DimMonth[MonthYear],
+    "MonthSort", DimMonth[MonthSort]
+)
+
+
+------------------------------------------------------------------
+
+
+End_Month =
+SELECTCOLUMNS(
+    DimMonth,
+    "MonthStart", DimMonth[MonthStart],
+    "MonthYear", DimMonth[MonthYear],
+    "MonthSort", DimMonth[MonthSort]
+)
