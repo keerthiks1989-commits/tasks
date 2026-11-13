@@ -1,0 +1,34 @@
+
+Selected_Month_Count =
+VAR StartMonth =
+    SELECTEDVALUE(Start_Month[MonthStart])
+VAR EndMonth =
+    SELECTEDVALUE(End_Month[MonthStart])
+RETURN
+IF(
+    NOT ISBLANK(StartMonth)
+        && NOT ISBLANK(EndMonth)
+        && StartMonth <= EndMonth,
+    DATEDIFF(StartMonth, EndMonth, MONTH) + 1,
+    BLANK()
+)
+
+-------------------------------------------------------------------------------------------
+
+Reporting_Period_Valid =
+VAR StartMonth =
+    [Selected_Start_Month]
+VAR EndMonth =
+    [Selected_End_Month]
+VAR MonthCount =
+    [Selected_Month_Count]
+RETURN
+IF(
+    NOT ISBLANK(StartMonth)
+        && NOT ISBLANK(EndMonth)
+        && StartMonth <= EndMonth
+        && MonthCount >= 1
+        && MonthCount <= 12,
+    1,
+    0
+)
