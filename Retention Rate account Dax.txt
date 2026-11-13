@@ -1,0 +1,38 @@
+
+Retention_Rate_Account =
+VAR StartMonth =
+    SELECTEDVALUE(Start_Month[MonthStart])
+
+VAR EndMonth =
+    SELECTEDVALUE(End_Month[MonthStart])
+
+VAR OpeningDate =
+    EOMONTH(StartMonth, -1)
+
+VAR OpeningAccounts =
+    CALCULATE(
+        SUM(Sheet_1[opening_accounts_r12]),
+        REMOVEFILTERS(DimMonth),
+        Sheet_1[month_start] = EndMonth,
+        Sheet_1[r12_open_date] = OpeningDate
+    )
+
+VAR ExitedOpeningAccounts =
+    CALCULATE(
+        SUM(Sheet_1[cohort_exited_accounts_r12]),
+        REMOVEFILTERS(DimMonth),
+        Sheet_1[month_start] = EndMonth,
+        Sheet_1[r12_open_date] = OpeningDate
+    )
+
+RETURN
+IF(
+    ISBLANK(StartMonth)
+        || ISBLANK(EndMonth)
+        || StartMonth <> EDATE(EndMonth, -11),
+    BLANK(),
+    1 - DIVIDE(
+        ExitedOpeningAccounts,
+        OpeningAccounts
+    )
+)
