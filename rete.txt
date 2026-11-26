@@ -1,0 +1,13 @@
+
+Retention Rate Accounts - Change Label =
+VAR _Change =
+    [Retention Rate Accounts - Change]
+
+RETURN
+IF(
+    ISBLANK(_Change),
+    BLANK(),
+    IF(_Change >= 0, "▲ ", "▼ ")
+        & FORMAT(ABS(_Change) * 100, "0.0")
+        & " pp vs Start Month"
+)
