@@ -1,0 +1,26 @@
+
+Month Selection Warning =
+VAR _Start =
+    [Selected Start Month]
+
+VAR _End =
+    [Selected End Month]
+
+VAR _MonthDifference =
+    DATEDIFF(_Start, _End, MONTH)
+
+RETURN
+SWITCH(
+    TRUE(),
+
+    ISBLANK(_Start) || ISBLANK(_End),
+        "⚠ Please select both months",
+
+    _End < _Start,
+        "⚠ End Month must not be earlier than Start Month",
+
+    _MonthDifference > 12,
+        "⚠ Maximum 13 months allowed",
+
+    BLANK()
+)
