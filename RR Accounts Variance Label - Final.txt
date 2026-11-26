@@ -1,0 +1,24 @@
+
+RR Accounts Variance Label - Final =
+VAR _Variance =
+    [RR Accounts Variance - Final]
+
+VAR _StartMonth =
+    [Selected Start Month]
+
+RETURN
+IF(
+    ISBLANK(_Variance)
+        || ISBLANK(_StartMonth),
+    BLANK(),
+
+    SWITCH(
+        TRUE(),
+        _Variance > 0, "▲ ",
+        _Variance < 0, "▼ ",
+        "● "
+    )
+    & FORMAT(ABS(_Variance) * 100, "0.0")
+    & " pp vs "
+    & FORMAT(_StartMonth, "MMM-yy")
+)
