@@ -1,0 +1,101 @@
+
+Calendar =
+ADDCOLUMNS(
+    CALENDAR(
+        DATE(2023, 4, 1),
+        DATE(2027, 12, 31)
+    ),
+    "MonthStart",
+        DATE(YEAR([Date]), MONTH([Date]), 1),
+    "MonthEnd",
+        EOMONTH([Date], 0),
+    "Monthyear",
+        FORMAT([Date], "MMM-yy"),
+    "Year",
+        YEAR([Date]),
+    "MonthNumber",
+        MONTH([Date])
+)
+
+
+--------------------------------------------------------
+
+
+Start_Month =
+DISTINCT(
+    SELECTCOLUMNS(
+        'Calendar',
+        "MonthStart", 'Calendar'[MonthStart],
+        "MonthYear", 'Calendar'[Monthyear]
+    )
+)
+
+-------------------------------------------------------------
+
+
+
+End_Month =
+DISTINCT(
+    SELECTCOLUMNS(
+        'Calendar',
+        "MonthStart", 'Calendar'[MonthStart],
+        "MonthYear", 'Calendar'[Monthyear]
+    )
+)
+
+
+------------------------------------------------------------
+
+
+Selected Start Month =
+SELECTEDVALUE(Start_Month[MonthStart])
+
+---------------------------------------------------------------
+
+
+Selected End Month =
+SELECTEDVALUE(End_Month[MonthStart])
+
+
+-------------------------------------------------------------
+
+
+Month Selection Status =
+VAR _Start =
+    [Selected Start Month]
+
+VAR _End =
+    [Selected End Month]
+
+VAR _MonthDifference =
+    DATEDIFF(_Start, _End, MONTH)
+
+RETURN
+SWITCH(
+    TRUE(),
+    ISBLANK(_Start) || ISBLANK(_End),
+        "Please select both months",
+
+    _End < _Start,
+        "Invalid: End Month must be after Start Month",
+
+    _MonthDifference > 11,
+        "Invalid: Maximum 12-month difference allowed",
+
+    "Valid Selection"
+)
+
+
+----------------------------------------------------------------------------------
+
+
+Month Selection Valid =
+IF(
+    [Month Selection Status] = "Valid Selection",
+    1,
+    0
+)
+
+
+---------------------------------------------------------------------------------------
+
