@@ -1,0 +1,73 @@
+
+Churn Risk Accounts - End =
+VAR _EndMonth =
+    [Selected End Month]
+
+VAR _MonthKey =
+    YEAR(_EndMonth) * 100
+        + MONTH(_EndMonth)
+
+RETURN
+IF(
+    ISBLANK(_EndMonth)
+        || [Month Selection Valid] <> 1,
+    BLANK(),
+    CALCULATE(
+        DISTINCTCOUNT(
+            'vw_factaccountfundmonth'[accountid]
+        ),
+        REMOVEFILTERS('Calendar'),
+        TREATAS(
+            {_MonthKey},
+            'vw_factaccountfundmonth'[monthkey]
+        ),
+        KEEPFILTERS(
+            'vw_factaccountfundmonth'[risk_band]
+                <> BLANK()
+        )
+    )
+)
+
+-----------------------------------------------------------------------------------------------------
+
+Total Members - Churn Risk =
+VAR _EndMonth =
+    [Selected End Month]
+
+VAR _MonthKey =
+    YEAR(_EndMonth) * 100
+        + MONTH(_EndMonth)
+
+RETURN
+IF(
+    ISBLANK(_EndMonth)
+        || [Month Selection Valid] <> 1,
+    BLANK(),
+    CALCULATE(
+        DISTINCTCOUNT(
+            'vw_factaccountfundmonth'[accountid]
+        ),
+        REMOVEFILTERS('Calendar'),
+        REMOVEFILTERS(
+            'vw_factaccountfundmonth'[risk_band]
+        ),
+        TREATAS(
+            {_MonthKey},
+            'vw_factaccountfundmonth'[monthkey]
+        ),
+        'vw_factaccountfundmonth'[risk_band]
+            <> BLANK()
+    )
+)
+
+
+---------------------------------------------------------------------------------------------------------
+
+
+Churn Risk % of Total =
+DIVIDE(
+    [Churn Risk Accounts - End],
+    [Total Members - Churn Risk]
+)
+
+---------------------------------------------------------------------------------------------------
