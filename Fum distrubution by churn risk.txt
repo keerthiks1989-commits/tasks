@@ -1,0 +1,61 @@
+
+FUM by Churn Risk - End =
+VAR _EndMonth =
+    [Selected End Month]
+
+VAR _MonthKey =
+    YEAR(_EndMonth) * 100
+        + MONTH(_EndMonth)
+
+RETURN
+IF(
+    ISBLANK(_EndMonth)
+        || [Month Selection Valid] <> 1,
+    BLANK(),
+    CALCULATE(
+        SUMX(
+            VALUES(
+                'vw_factaccountfundmonth'[accountid]
+            ),
+            CALCULATE(
+                MAX(
+                    'vw_factaccountfundmonth'
+                        [current_account_fum_amount]
+                )
+            )
+        ),
+        REMOVEFILTERS('Calendar'),
+        TREATAS(
+            {_MonthKey},
+            'vw_factaccountfundmonth'[monthkey]
+        ),
+        KEEPFILTERS(
+            'vw_factaccountfundmonth'[risk_band]
+                <> BLANK()
+        )
+    )
+)
+
+----------------------------------------------------------------------------------------
+
+Total FUM - End =
+CALCULATE(
+    [FUM by Churn Risk - End],
+    REMOVEFILTERS(
+        'vw_factaccountfundmonth'[risk_band]
+    )
+)
+
+
+---------------------------------------------------------------------------------------
+
+
+FUM Share by Churn Risk =
+DIVIDE(
+    [FUM by Churn Risk - End],
+    [Total FUM - End]
+)
+
+
+----------------------------------------------------------------------------------------------
+
