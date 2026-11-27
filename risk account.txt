@@ -1,0 +1,32 @@
+
+Accounts at Risk - End =
+VAR _EndMonth =
+    [Selected End Month]
+
+VAR _MonthKey =
+    YEAR(_EndMonth) * 100
+        + MONTH(_EndMonth)
+
+VAR _AtRiskCount =
+    CALCULATE(
+        DISTINCTCOUNT(
+            'vw_factaccountfundmonth'[accountid]
+        ),
+        REMOVEFILTERS('Calendar'),
+        TREATAS(
+            {_MonthKey},
+            'vw_factaccountfundmonth'[monthkey]
+        ),
+        KEEPFILTERS(
+            'vw_factaccountfundmonth'[retention_category]
+                = "At Risk"
+        )
+    )
+
+RETURN
+IF(
+    ISBLANK(_EndMonth)
+        || [Month Selection Valid] <> 1,
+    BLANK(),
+    COALESCE(_AtRiskCount, 0)
+)
