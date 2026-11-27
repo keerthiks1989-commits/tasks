@@ -1,0 +1,175 @@
+
+Opening FUM R12 =
+SUMX(
+    VALUES(
+        'vw_factaccountfundmonth'[fundid]
+    ),
+    CALCULATE(
+        MAX(
+            'vw_factaccountfundmonth'[fund_opening_fum_r12]
+        )
+    )
+)
+
+-----------------------------------------------------------------------
+
+Cohort Exited FUM R12 =
+SUMX(
+    VALUES(
+        'vw_factaccountfundmonth'[fundid]
+    ),
+    CALCULATE(
+        MAX(
+            'vw_factaccountfundmonth'[fund_cohort_exited_fum_r12]
+        )
+    )
+)
+
+
+-----------------------------------------------------------------------------
+
+
+Retention Rate FUM - End =
+VAR _EndMonth =
+    [Selected End Month]
+
+VAR _MonthKey =
+    YEAR(_EndMonth) * 100
+        + MONTH(_EndMonth)
+
+VAR _Opening =
+    CALCULATE(
+        [Opening FUM R12],
+        REMOVEFILTERS('Calendar'),
+        TREATAS(
+            {_MonthKey},
+            'vw_factaccountfundmonth'[monthkey]
+        )
+    )
+
+VAR _Exited =
+    CALCULATE(
+        [Cohort Exited FUM R12],
+        REMOVEFILTERS('Calendar'),
+        TREATAS(
+            {_MonthKey},
+            'vw_factaccountfundmonth'[monthkey]
+        )
+    )
+
+RETURN
+IF(
+    [Month Selection Valid] <> 1
+        || ISBLANK(_EndMonth)
+        || ISBLANK(_Opening)
+        || _Opening <= 0
+        || ISBLANK(_Exited),
+    BLANK(),
+    1 - DIVIDE(_Exited, _Opening)
+)
+
+
+------------------------------------------
+
+
+Retention Rate FUM - Start =
+VAR _StartMonth =
+    [Selected Start Month]
+
+VAR _MonthKey =
+    YEAR(_StartMonth) * 100
+        + MONTH(_StartMonth)
+
+VAR _Opening =
+    CALCULATE(
+        [Opening FUM R12],
+        REMOVEFILTERS('Calendar'),
+        TREATAS(
+            {_MonthKey},
+            'vw_factaccountfundmonth'[monthkey]
+        )
+    )
+
+VAR _Exited =
+    CALCULATE(
+        [Cohort Exited FUM R12],
+        REMOVEFILTERS('Calendar'),
+        TREATAS(
+            {_MonthKey},
+            'vw_factaccountfundmonth'[monthkey]
+        )
+    )
+
+RETURN
+IF(
+    [Month Selection Valid] <> 1
+        || ISBLANK(_StartMonth)
+        || ISBLANK(_Opening)
+        || _Opening <= 0
+        || ISBLANK(_Exited),
+    BLANK(),
+    1 - DIVIDE(_Exited, _Opening)
+)
+
+
+---------------------------------------------------------
+
+
+Retention Rate FUM - Change =
+VAR _EndRate =
+    [Retention Rate FUM - End]
+
+VAR _StartRate =
+    [Retention Rate FUM - Start]
+
+RETURN
+IF(
+    ISBLANK(_EndRate)
+        || ISBLANK(_StartRate),
+    BLANK(),
+    _EndRate - _StartRate
+)
+
+----------------------------------------------------------
+
+
+Retention Rate FUM - Change Label =
+VAR _Variance =
+    [Retention Rate FUM - Change]
+
+VAR _StartMonth =
+    [Selected Start Month]
+
+RETURN
+IF(
+    ISBLANK(_Variance)
+        || ISBLANK(_StartMonth),
+    BLANK(),
+    SWITCH(
+        TRUE(),
+        _Variance > 0, "▲ ",
+        _Variance < 0, "▼ ",
+        "● "
+    )
+    & FORMAT(ABS(_Variance) * 100, "0.0")
+    & " pp vs "
+    & FORMAT(_StartMonth, "MMM-yy")
+)
+
+----------------------------------------------------------------------
+
+Retention Rate FUM - Change Color =
+VAR _Variance =
+    [Retention Rate FUM - Change]
+
+RETURN
+SWITCH(
+    TRUE(),
+    ISBLANK(_Variance), "#808080",
+    _Variance > 0, "#008000",
+    _Variance < 0, "#D32F2F",
+    "#808080"
+)
+
+
+-----------------------------------------
