@@ -1,0 +1,76 @@
+
+Churn Driver Accounts - End =
+VAR _EndMonth =
+    [Selected End Month]
+
+VAR _MonthKey =
+    YEAR(_EndMonth) * 100
+        + MONTH(_EndMonth)
+
+RETURN
+IF(
+    ISBLANK(_EndMonth)
+        || [Month Selection Valid] <> 1,
+    BLANK(),
+    CALCULATE(
+        DISTINCTCOUNT(
+            'vw_factaccountfundmonth'[accountid]
+        ),
+        REMOVEFILTERS('Calendar'),
+        TREATAS(
+            {_MonthKey},
+            'vw_factaccountfundmonth'[monthkey]
+        ),
+        REMOVEFILTERS(
+            'vw_factaccountfundmonth'[retention_category]
+        ),
+        'vw_factaccountfundmonth'[retention_category]
+            = "At Risk"
+    )
+)
+
+
+------------------------------------------------------------------------------------------
+
+
+Total At Risk Members - End =
+VAR _EndMonth =
+    [Selected End Month]
+
+VAR _MonthKey =
+    YEAR(_EndMonth) * 100
+        + MONTH(_EndMonth)
+
+RETURN
+IF(
+    ISBLANK(_EndMonth)
+        || [Month Selection Valid] <> 1,
+    BLANK(),
+    CALCULATE(
+        DISTINCTCOUNT(
+            'vw_factaccountfundmonth'[accountid]
+        ),
+        REMOVEFILTERS('Calendar'),
+        REMOVEFILTERS(
+            'vw_factaccountfundmonth'[primary_churn_driver]
+        ),
+        REMOVEFILTERS(
+            'vw_factaccountfundmonth'[retention_category]
+        ),
+        TREATAS(
+            {_MonthKey},
+            'vw_factaccountfundmonth'[monthkey]
+        ),
+        'vw_factaccountfundmonth'[retention_category]
+            = "At Risk"
+    )
+)
+
+-------------------------------------------------------------------------------------
+
+
+Churn Driver % - End =
+DIVIDE(
+    [Churn Driver Accounts - End],
+    [Total At Risk Members - End]
+)
