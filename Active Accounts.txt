@@ -1,0 +1,126 @@
+
+Active Accounts - End =
+VAR _EndMonth =
+    [Selected End Month]
+
+VAR _MonthKey =
+    YEAR(_EndMonth) * 100
+        + MONTH(_EndMonth)
+
+RETURN
+IF(
+    ISBLANK(_EndMonth)
+        || [Month Selection Valid] <> 1,
+    BLANK(),
+    CALCULATE(
+        DISTINCTCOUNT(
+            'vw_factaccountfundmonth'[accountid]
+        ),
+        REMOVEFILTERS('Calendar'),
+        REMOVEFILTERS(
+            'vw_factaccountfundmonth'[accountstatus]
+        ),
+        TREATAS(
+            {_MonthKey},
+            'vw_factaccountfundmonth'[monthkey]
+        ),
+        'vw_factaccountfundmonth'[accountstatus] = "Active"
+    )
+)
+
+
+-------------------------------------------------------------------------------------------------
+
+Active Accounts - Start =
+VAR _StartMonth =
+    [Selected Start Month]
+
+VAR _MonthKey =
+    YEAR(_StartMonth) * 100
+        + MONTH(_StartMonth)
+
+RETURN
+IF(
+    ISBLANK(_StartMonth)
+        || [Month Selection Valid] <> 1,
+    BLANK(),
+    CALCULATE(
+        DISTINCTCOUNT(
+            'vw_factaccountfundmonth'[accountid]
+        ),
+        REMOVEFILTERS('Calendar'),
+        REMOVEFILTERS(
+            'vw_factaccountfundmonth'[accountstatus]
+        ),
+        TREATAS(
+            {_MonthKey},
+            'vw_factaccountfundmonth'[monthkey]
+        ),
+        'vw_factaccountfundmonth'[accountstatus] = "Active"
+    )
+)
+
+
+-------------------------------------------------------------------------------------------------------
+
+
+Active Accounts - Change =
+VAR _EndCount =
+    [Active Accounts - End]
+
+VAR _StartCount =
+    [Active Accounts - Start]
+
+RETURN
+IF(
+    ISBLANK(_EndCount)
+        || ISBLANK(_StartCount)
+        || _StartCount <= 0,
+    BLANK(),
+    DIVIDE(
+        _EndCount - _StartCount,
+        _StartCount
+    )
+)
+
+--------------------------------------------------------------------------------------------------------------
+
+
+Active Accounts - Change Label =
+VAR _Change =
+    [Active Accounts - Change]
+
+VAR _StartMonth =
+    [Selected Start Month]
+
+RETURN
+IF(
+    ISBLANK(_Change)
+        || ISBLANK(_StartMonth),
+    BLANK(),
+    SWITCH(
+        TRUE(),
+        _Change > 0, "▲ ",
+        _Change < 0, "▼ ",
+        "● "
+    )
+    & FORMAT(ABS(_Change), "0.0%")
+    & " vs "
+    & FORMAT(_StartMonth, "MMM-yy")
+)
+
+------------------------------------------------------------------------------------------------------------------------
+
+
+Active Accounts - Change Color =
+VAR _Change =
+    [Active Accounts - Change]
+
+RETURN
+SWITCH(
+    TRUE(),
+    ISBLANK(_Change), "#808080",
+    _Change > 0, "#008000",
+    _Change < 0, "#D32F2F",
+    "#808080"
+)
